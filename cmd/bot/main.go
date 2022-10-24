@@ -8,10 +8,12 @@ import (
 )
 
 func main() {
+
 	config, err := config.New()
 	if err != nil {
 		log.Fatal("config init failed:", err)
 	}
+
 
 	tgClient, err := tg.New(config)
 	if err != nil {
@@ -22,3 +24,4 @@ func main() {
 
 	tgClient.ListenUpdates(msgModel)
 }
+
