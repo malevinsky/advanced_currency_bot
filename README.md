@@ -1,5 +1,26 @@
 
 ## Структура проекта
+
+```
+├── `cmd/``
+│   └── `bot/``
+│       └── `main.go`                # входная точка в проект
+│
+├── `internal/``
+│   ├── clients/             #
+│   ├── config/              # Обработка конфиг-файла
+│   ├── mocks/     			# 
+│   ├── model/  
+│ 	│ 	└── messages/
+│ 	│		└── expenses.go          
+│ 	│		└── incoming_msg.go
+│	│		└── report.go
+│   │
+│   └── storage          	#package, в котором хранятся данные по тратам
+│       └── user.go		
+│ 
+```
+
 ### cmd/bot
 `main.go` — входная точка в проект
 
