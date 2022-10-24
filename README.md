@@ -5,7 +5,6 @@
 
 - `internal/clients`
 - `internal/config` — обработка конфиг-файла
-- `internal/controllers` — обработка контроллеров
 - `internal/mocks` —
 - `internal/model` — файл incoming_msg.go, в котором обрабатываются
 - `internal/storage` — структуры, в которых хранятся данные
@@ -31,10 +30,9 @@
 
 --------
 
-API для получения валют онлайн:
-http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1
+API для получения валют онлайн: `http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1`
 
-#### Как высчитывается валюта
+### Как высчитывается валюта
 **Base** — базовая валюта, от которой высчитываются значения остальных. 
 
 Например, мы знаем, что: 
@@ -42,8 +40,14 @@ http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575d
 1 USD = 0.73 GBP, 
 Чтобы узнать, сколько EUR равняется GBP?
 
-Формула: ```a / b = c```
-```EURGBP = (USDGBP / USDEUR) = (0.73 / 0.87) = 0.84```
+Формула: 
+```
+a / b = c
+```
+
+```
+EURGBP = (USDGBP / USDEUR) = (0.73 / 0.87) = 0.84
+```
 
 -------
 
