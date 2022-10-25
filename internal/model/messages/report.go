@@ -9,8 +9,6 @@ import (
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/storage"
 )
 
-const ReportPrefix = "/get"
-
 func GetReport(userID int64, message string) (string, error) {
 	start_period, err := parsePeriod(message)
 
@@ -23,16 +21,31 @@ func GetReport(userID int64, message string) (string, error) {
 }
 
 func parsePeriod(message string) (*time.Time, error) {
-	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, ReportPrefix))
+	/**
+	В этой функции происходят похожие процессы на обработку траты в expenses:
+	1. Получаем команду в string, её нужно разбить на части.
+	2. Обрабатываем части. В нашем случае она одна — week, month, year.
+	3. Если пользователь записал что-то криво, вылезет ошибка с подсказкой, как исправить.
+	 */
+	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/get"))
 	parts := strings.Split(normalizedMessage, " ")
 
 	if len(parts) != 1 {
-		return nil, errors.New("Report must consist of one part: period")
+		return nil, errors.New("Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
 	}
 
-	period := strings.ToLower(parts[0])
-	now := time.Now()
+	period := strings.ToLower(parts[0]) //на всякий случай, если напишет YeAr, а то может быть ошибка
 
+	/**
+
+	1. Узнаём время на момент отправки сообщения.
+	2. Нужно получить период Time, за который мы выводим результаты.
+	О цифрах в Addtime:
+	- -7 — это нынешняя дата минус 7 дней;
+	- -1 — это нынешняя дата минус один месяц;
+	- -1 — это нынешняя дата минус год.
+	 */
+	now := time.Now()
 	switch period {
 	case "week":
 		now = now.AddDate(0, 0, -7)
@@ -41,7 +54,7 @@ func parsePeriod(message string) (*time.Time, error) {
 	case "year":
 		now = now.AddDate(-1, 0, 0)
 	default:
-		return nil, errors.New("Report must be one of: week, month, year")
+		return nil, errors.New("Неправильная команда. Я использую только week, month, year. Например, /get year.")
 	}
 
 	return &now, nil
@@ -51,9 +64,12 @@ func parsePeriod(message string) (*time.Time, error) {
 func formatExpenses(expenses []*storage.Expense) string {
 
 	if len(expenses) == 0 {
-		return "No expenses are found"
+		return "Вы пока не добавили трату."
 	}
 
+	/**
+	Цель — достать значения и красиво их вывести. Достаё
+	 */
 	expensesByCategory := make(map[string]int)
 	for _, expense := range expenses {
 		expensesByCategory[expense.Category] += expense.Amount
@@ -64,6 +80,7 @@ func formatExpenses(expenses []*storage.Expense) string {
 	for category, amount := range expensesByCategory {
 		formattedResult.WriteString(fmt.Sprintf("%s: %d\n", category, amount))
 	}
+
 
 	return formattedResult.String()
 }

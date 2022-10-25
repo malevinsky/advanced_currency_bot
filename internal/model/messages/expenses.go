@@ -77,7 +77,8 @@ func parseExpense(message string) (*storage.Expense, error) {
 		_ = fmt.Sprint("Ошибка: введите три параметра.")
 		return nil, nil
 	}
-	MainCurr = parts[0]
+	currencyupper := strings.ToUpper(parts[0]) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
+	MainCurr = currencyupper
 	/**
 	Сейчас все элементы в строке — String. Чтобы траты можно было складывать, нужно перевести её в Int.
 	1. Преобразуем сумму траты из String в Int с помощью Atoi.
@@ -105,14 +106,14 @@ func parseExpense(message string) (*storage.Expense, error) {
 	fmt.Println(currency)
 
 	if parts[0] == "RUB" {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day."
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0]
 		Greting = textgreting
 	} else {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day."
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0]
 		Greting = textgreting
 	}
 
-	return storage.NewExpense(amount, parts[2], ts, amountfl), nil
+	return storage.NewExpense(i, parts[2], ts, amountfl), nil
 }
 
 func ValidCurr(currency string, amountfl float64) float64 {

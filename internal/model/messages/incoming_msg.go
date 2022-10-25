@@ -67,7 +67,6 @@ func (s *Model) IncomingMessage(msg Message) error {
 		}
 
 	}
-	response = Greting
 
 
 	return s.tgClient.SendMessage(response, msg.UserID)

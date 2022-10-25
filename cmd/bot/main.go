@@ -14,7 +14,6 @@ func main() {
 		log.Fatal("config init failed:", err)
 	}
 
-
 	tgClient, err := tg.New(config)
 	if err != nil {
 		log.Fatal("tg client init failed:", err)
