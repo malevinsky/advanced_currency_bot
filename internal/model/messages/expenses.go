@@ -44,7 +44,7 @@ type Rates struct {
 
 const ExpensesPrefix = "/add"
 
-// Parse and store expense for given user
+
 func AddExpense(id int64, message string) error {
 	expense, err := parseExpense(message) //
 
@@ -105,10 +105,10 @@ func parseExpense(message string) (*storage.Expense, error) {
 	fmt.Println(currency)
 
 	if parts[0] == "RUB" {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nДополнительные команды: \nsummary — сумма всех трат"
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day."
 		Greting = textgreting
 	} else {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nДополнительные команды: \nsummary — сумма всех трат"
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day."
 		Greting = textgreting
 	}
 
@@ -116,7 +116,9 @@ func parseExpense(message string) (*storage.Expense, error) {
 }
 
 func ValidCurr(currency string, amountfl float64) float64 {
+/**
 
+ */
 	switch currency {
 	case "USD":
 		rubles := parseapi(1)

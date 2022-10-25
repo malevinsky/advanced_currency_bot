@@ -65,8 +65,10 @@ func (s *Model) IncomingMessage(msg Message) error {
 		} else {
 			response = report
 		}
+
 	}
 	response = Greting
+
 
 	return s.tgClient.SendMessage(response, msg.UserID)
 }
