@@ -65,7 +65,7 @@ func (s *Model) IncomingMessage(msg Message) error {
 		if err != nil {
 			response = err.Error()
 		} else {
-			response = report
+			response = "Я посчитал статистику по вашим тратам.\nВалюта, которую вы выбрали: " + MainCurr + report
 		}
 
 	}

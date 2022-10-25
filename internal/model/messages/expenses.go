@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
 	"strconv"
 	"strings"
 	"time"
@@ -316,15 +315,8 @@ func formatExpenses(expenses []*storage.Expense, rates []*storage.Rates) string 
 	var formattedResult strings.Builder
 
 	for category, amount := range expensesByCategory {
-		formattedResult.WriteString(fmt.Sprintf("Я посчитал статистику по вашим тратам.\nВалюта, которую вы выбрали: " + MainCurr + "\n\n%s: %d\n", category, amount))
+		formattedResult.WriteString(fmt.Sprintf("\n%s: %d", category, amount))
 	}
-	/**
-	  Я посчитал статистику по вашим тратам.
-	  Валюта, которую вы выбрали: ВАЛЮТА.
-
-	  Еда: 50
-	  Медицина: 60
-	*/
 
 	return formattedResult.String()
 }
