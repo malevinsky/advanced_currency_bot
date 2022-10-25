@@ -1,6 +1,7 @@
 package messages
 
 import (
+	//"strconv"
 	"strings"
 )
 
@@ -33,6 +34,7 @@ type Message struct {
 
 
 func (s *Model) IncomingMessage(msg Message) error {
+	go parseapi(9)
 	/**
 	Пользователь что-нибудь отправляет, далее проверяем команду.
 	Сценария четыре:
@@ -67,7 +69,7 @@ func (s *Model) IncomingMessage(msg Message) error {
 		}
 
 	}
-
-
 	return s.tgClient.SendMessage(response, msg.UserID)
 }
+
+

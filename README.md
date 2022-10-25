@@ -81,3 +81,20 @@ EURGBP = (USDGBP / USDEUR) = (0.73 / 0.87) = 0.84
 
 
 
+func revert(expenses []*storage.Expense) string {
+	switch MainCurr {
+	case "EUR":
+		finalAmount := expense.Amount / Currency1.Rates.RUB
+		return finalAmount
+	case "USD":
+		difference := Currency1.Rates.RUB / Currency1.Rates.USD
+		finalAmount := expense.Amount / difference
+		return finalAmount
+	case "CNY":
+		difference := Currency1.Rates.RUB / Currency1.Rates.CNY
+		finalAmount := expense.Amount / difference
+		return finalAmount
+	}
+	return string(0)
+}
+

@@ -11,22 +11,53 @@ type User struct {
 }
 
 type Expense struct {
-	Amount		int
+	Amount		float64
 	Category	string
 	Ts			time.Time
 	Rubles		float64
 }
 
-func NewExpense(amount int, category string, ts time.Time, rubles float64) *Expense {
+func NewExpense(amount float64, category string, ts time.Time, rubles float64) *Expense {
 	/**
 	Добавляем передаваемые значения в структуру Expense.
-	 */
+	*/
 	return &Expense{
 		Amount:		amount,
 		Category:	category,
 		Ts:			ts,
 		Rubles:		rubles,
 	}
+}
+
+
+type Currency struct {
+	Success   bool
+	Timestamp int
+	Base      string
+	Date      string
+	Rates     Rates
+}
+
+type Rates struct {
+	USD float64
+	CNY float64
+	RUB float64
+	EUR float64
+}
+
+func CurrencyStorage2(usd float64, cny float64, rub float64, eur float64) *Rates {
+	return &Rates{
+		USD: usd,
+		CNY: cny,
+		RUB: rub,
+		EUR: eur,
+	}
+}
+
+func GetRates() []*Rates {
+	var result []*Rates
+
+	return result
 }
 
 func AddExpense(userID int64, expense *Expense) {
