@@ -21,6 +21,11 @@ func New(tgClient MessageSender) *Model {
 	}
 }
 
+/**
+В сообщении от пользователя хранится две сущности:
+- сам текст,
+- идентификатор отправителя.
+*/
 type Message struct {
 	Text      string
 	UserID    int64
@@ -28,34 +33,31 @@ type Message struct {
 
 
 func (s *Model) IncomingMessage(msg Message) error {
-	response := "Unknown command"
-
-
-	greetings := "Привет! Это бот для учёта трат. Использование бота:\nДобавьте трату командой /add + валюта + сумма + категория + дата."
 	/**
-	При нажатии start отображается приветствие
-	 */
-	if msg.Text == "/start" {
-		//greetings := "Variable string %d content",
+	Пользователь что-нибудь отправляет, далее проверяем команду.
+	Сценария четыре:
+	- /start — приветствие и подсказка о работе бота;
+	- /add — добавление траты и смена основной валюты;
+	- /get — получение статистики по тратам.
 
+	Хотелось добавить кнопки, но почему-то не вышло.
+	 */
+	response := "Что-то не то, отправьте правильную команду"
+
+	if msg.Text == "/start" {
+		greetings := "Привет! Это бот для учёта трат. Использование бота:\nДобавьте трату командой /add + валюта + сумма + категория + дата."
 		return s.tgClient.SendMessage(greetings, msg.UserID)
 	}
 
-	/**
-	При нажатии /currency
-	 */
-	if msg.Text == "/currency" {
-		//добавить отдельную функцию для добавления валюты
-		//return s.tgClient.SendMessage("hello", msg.UserID)
-	}
-
-	if strings.HasPrefix(msg.Text, "/add_expense") {
-		err := AddExpense(msg.UserID, msg.Text)
+	if strings.HasPrefix(msg.Text, "/add") {
+		err := AddExpense(msg.UserID, msg.Text) // -> файл expenses.go
 		if err != nil {
 			response = err.Error()
 		} else {
-			response = "Expense added successfully"
+			response = Greting 	// В expenses.go есть переменная, в которую я записываю данные траты.
+								// Это позволяет посылать подтверждения с данными по каждой трате.
 		}
+
 	} else if strings.HasPrefix(msg.Text, "/get") {
 		report, err := GetReport(msg.UserID, msg.Text)
 		if err != nil {

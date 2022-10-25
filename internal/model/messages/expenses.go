@@ -15,9 +15,18 @@ import (
 	"time"
 )
 
+/**
+MainCurr — валюта, на которую переключён бот. Для удобства я сделала так, чтобы её указывали прям при записи траты.
+Greeting — string, в который я записываю данные из команды, чтобы наглядно выводить отчэт о записанной траты.
+ */
 var MainCurr = ""
 var Greting = ""
 
+
+/**
+Currency и Rates — это структуры, куда записываются данные из API. Дополнительно EUR — его значение «1»,
+потому что это базовая валюта, от которой высчитываются значения остальных.
+*/
 type Currency struct {
 	Success   bool   `json:"success"`
 	Timestamp int    `json:"timestamp"`
@@ -33,11 +42,11 @@ type Rates struct {
 	EUR float64
 }
 
-const ExpensesPrefix = "/add_expense"
+const ExpensesPrefix = "/add"
 
 // Parse and store expense for given user
 func AddExpense(id int64, message string) error {
-	expense, err := parseExpense(message)
+	expense, err := parseExpense(message) //
 
 	if err != nil {
 		return err
@@ -77,8 +86,6 @@ func parseExpense(message string) (*storage.Expense, error) {
 	*/
 	amount, err := strconv.Atoi(parts[1])
 	amountfl := float64(amount)
-
-
 
 	if err != nil {
 		return nil, errors.New("Сумма должна быть цифрой")
