@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/storage"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -207,11 +206,11 @@ func parseapi(num int) float64{
 		defer func(Body io.ReadCloser) {
 			err := Body.Close()
 			if err != nil {
-
+				log.Fatal(getErr)
 			}
 		}(res.Body)
 	}
-	body, readErr := ioutil.ReadAll(res.Body)
+	body, readErr := io.ReadAll(res.Body)
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
