@@ -75,9 +75,11 @@ func parseCurrency(message string) (string, error) {
 
 	if len(parts) != 1 {
 		return "Напишите валюту правильно. Например: /currency EUR", nil
+	}
+	if parts[0] == "" {
+		return "Напишите валюту правильно. Например: /currency EUR", nil
 	} else {
-
-	currencyupper := strings.ToUpper(normalizedMessage) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
+		currencyupper := strings.ToUpper(normalizedMessage) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
 	MainCurr = currencyupper
 	return "Успешно установлена валюта: ", nil
 	}
