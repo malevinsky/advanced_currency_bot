@@ -51,13 +51,23 @@ func (s *Model) IncomingMessage(msg Message) error {
 		return s.tgClient.SendMessage(greetings, msg.UserID)
 	}
 
+	if strings.HasPrefix(msg.Text, "/currency") {
+		greetings, err := GetReport(msg.UserID, msg.Text)
+		if err != nil {
+			response = err.Error()
+		} else {
+			response = greetings
+		}
+		return s.tgClient.SendMessage(greetings + MainCurr, msg.UserID)
+	}
+
 	if strings.HasPrefix(msg.Text, "/add") {
 		err := AddExpense(msg.UserID, msg.Text) // -> файл expenses.go
 		if err != nil {
 			response = err.Error()
 		} else {
 			response = Greting 	// В expenses.go есть переменная, в которую я записываю данные траты.
-								// Это позволяет посылать подтверждения с данными по каждой трате.
+			return s.tgClient.SendMessage(response, msg.UserID)			// Это позволяет посылать подтверждения с данными по каждой трате.
 		}
 
 	} else if strings.HasPrefix(msg.Text, "/get") {
@@ -67,7 +77,6 @@ func (s *Model) IncomingMessage(msg Message) error {
 		} else {
 			response = "Я посчитал статистику по вашим тратам.\nВалюта, которую вы выбрали: " + MainCurr + report
 		}
-
 	}
 	return s.tgClient.SendMessage(response, msg.UserID)
 }

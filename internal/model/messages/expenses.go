@@ -48,8 +48,7 @@ type Rates struct {
 
 const ExpensesPrefix = "/add"
 
-
-func AddExpense(id int64, message string) error {
+func AddCurrency(id int64, message string) error {
 	expense, err := parseExpense(message) //
 
 	if err != nil {
@@ -58,6 +57,31 @@ func AddExpense(id int64, message string) error {
 
 	storage.AddExpense(id, expense)
 	return nil
+}
+
+
+func AddExpense(id int64, message string) error {
+	expense, err := parseExpense(message) //
+
+	if err != nil {
+		return err
+	}
+		storage.AddExpense(id, expense)
+		return nil
+}
+
+func parseCurrency(message string) (string, error) {
+	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/currency"))
+	parts := strings.Split(normalizedMessage, " ")
+
+	if len(parts) != 1 {
+		return "Напишите валюту правильно. Например: /currency EUR", nil
+	} else {
+
+	currencyupper := strings.ToUpper(normalizedMessage) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
+	MainCurr = currencyupper
+	return "Успешно установлена валюта: ", nil
+	}
 }
 
 func parseExpense(message string) (*storage.Expense, error) {
@@ -74,17 +98,12 @@ func parseExpense(message string) (*storage.Expense, error) {
 	*/
 	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, ExpensesPrefix))
 	parts := strings.Split(normalizedMessage, ", ")
-	fmt.Print("Это массив parts")
-
-	fmt.Print(parts)
-
 
 	if len(parts) != 4 { // Проверяем, что передаётся верное количество аргументов — 3.
 		_ = fmt.Sprint("Ошибка: введите три параметра.")
 		return nil, nil
 	}
-	currencyupper := strings.ToUpper(parts[0]) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
-	MainCurr = currencyupper
+
 	/**
 	Сейчас все элементы в строке — String. Чтобы траты можно было складывать, нужно перевести её в Int.
 	1. Преобразуем сумму траты из String в Int с помощью Atoi.
@@ -242,16 +261,27 @@ func parseapi(num int) float64{
 
 
 func GetReport(userID int64, message string) (string, error) {
-	start_period, err := parsePeriod(message)
 
-	if err != nil {
-		return "", err
+	if strings.HasPrefix(message, "/currency") {
+		answer, err := parseCurrency(message)
+
+		if err != nil {
+			return "", err
+		}
+		return answer, nil
+
+	} else {
+		start_period, err := parsePeriod(message)
+
+		if err != nil {
+			return "", err
+		}
+		expenses := storage.GetExpenses(userID, *start_period)
+		rates := storage.GetRates()
+		fmt.Print(rates)
+		return formatExpenses(expenses, rates), nil
 	}
 
-	expenses := storage.GetExpenses(userID, *start_period)
-	rates := storage.GetRates()
-	fmt.Print(rates)
-	return formatExpenses(expenses, rates), nil
 }
 
 func parsePeriod(message string) (*time.Time, error) {
@@ -300,7 +330,6 @@ func formatExpenses(expenses []*storage.Expense, rates []*storage.Rates) string 
 	if len(expenses) == 0 {
 		return "Вы пока не добавили трату."
 	}
-
 	/**
 	Цель — достать значения и красиво их вывести. Достаё
 	*/
@@ -338,12 +367,10 @@ func revert(expense *storage.Expense) float64 {
 	case "CNY":
 		difference := rub / cny
 		finalAmount := expense.Amount / difference
-		fmt.Println(expense.Amount)
-		fmt.Println(cny)
-		fmt.Print(difference)
+		//fmt.Println(expense.Amount)
+		//fmt.Println(cny)
+		//fmt.Print(difference)
 		return finalAmount
 	}
-	return 0
+	return expense.Amount
 }
-
-
