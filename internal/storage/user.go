@@ -2,7 +2,6 @@ package storage
 
 import "time"
 
-
 var userStorage map[int64]User = make(map[int64]User)
 
 type User struct {
@@ -11,10 +10,10 @@ type User struct {
 }
 
 type Expense struct {
-	Amount		float64
-	Category	string
-	Ts			time.Time
-	Rubles		float64
+	Amount   float64
+	Category string
+	Ts       time.Time
+	Rubles   float64
 }
 
 func NewExpense(amount float64, category string, ts time.Time, rubles float64) *Expense {
@@ -22,13 +21,12 @@ func NewExpense(amount float64, category string, ts time.Time, rubles float64) *
 	Добавляем передаваемые значения в структуру Expense.
 	*/
 	return &Expense{
-		Amount:		amount,
-		Category:	category,
-		Ts:			ts,
-		Rubles:		rubles,
+		Amount:   amount,
+		Category: category,
+		Ts:       ts,
+		Rubles:   rubles,
 	}
 }
-
 
 type Currency struct {
 	Success   bool

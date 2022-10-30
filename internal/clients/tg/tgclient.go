@@ -39,7 +39,7 @@ func (c *Client) SendMessage(text string, userID int64) error {
 func (c *Client) ListenUpdates(msgModel *messages.Model) {
 	/**
 	Функция нужна, чтобы получать новые сообщения, отправляемые пользователями.
-	 */
+	*/
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 

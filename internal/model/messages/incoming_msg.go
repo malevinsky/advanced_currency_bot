@@ -28,10 +28,9 @@ func New(tgClient MessageSender) *Model {
 - идентификатор отправителя.
 */
 type Message struct {
-	Text      string
-	UserID    int64
+	Text   string
+	UserID int64
 }
-
 
 func (s *Model) IncomingMessage(msg Message) error {
 	go parseapi(9)
@@ -43,7 +42,7 @@ func (s *Model) IncomingMessage(msg Message) error {
 	- /get — получение статистики по тратам.
 
 	Хотелось добавить кнопки, но почему-то не вышло.
-	 */
+	*/
 	response := "Что-то не то, отправьте правильную команду"
 
 	if msg.Text == "/start" {
@@ -58,7 +57,7 @@ func (s *Model) IncomingMessage(msg Message) error {
 		} else {
 			response = greetings
 		}
-		return s.tgClient.SendMessage(greetings + MainCurr, msg.UserID)
+		return s.tgClient.SendMessage(greetings+MainCurr, msg.UserID)
 	}
 
 	if strings.HasPrefix(msg.Text, "/add") {
@@ -66,8 +65,8 @@ func (s *Model) IncomingMessage(msg Message) error {
 		if err != nil {
 			response = err.Error()
 		} else {
-			response = Greting 	// В expenses.go есть переменная, в которую я записываю данные траты.
-			return s.tgClient.SendMessage(response, msg.UserID)			// Это позволяет посылать подтверждения с данными по каждой трате.
+			response = Greting                                  // В expenses.go есть переменная, в которую я записываю данные траты.
+			return s.tgClient.SendMessage(response, msg.UserID) // Это позволяет посылать подтверждения с данными по каждой трате.
 		}
 
 	} else if strings.HasPrefix(msg.Text, "/get") {
@@ -80,5 +79,3 @@ func (s *Model) IncomingMessage(msg Message) error {
 	}
 	return s.tgClient.SendMessage(response, msg.UserID)
 }
-
-

@@ -1,6 +1,5 @@
 package messages
 
-
 import (
 	"encoding/json"
 	"errors"
@@ -17,7 +16,7 @@ import (
 /**
 MainCurr — валюта, на которую переключён бот. Для удобства я сделала так, чтобы её указывали прям при записи траты.
 Greeting — string, в который я записываю данные из команды, чтобы наглядно выводить отчэт о записанной траты.
- */
+*/
 var MainCurr = ""
 var Greting = ""
 
@@ -58,15 +57,14 @@ func AddCurrency(id int64, message string) error {
 	return nil
 }
 
-
 func AddExpense(id int64, message string) error {
 	expense, err := parseExpense(message) //
 
 	if err != nil {
 		return err
 	}
-		storage.AddExpense(id, expense)
-		return nil
+	storage.AddExpense(id, expense)
+	return nil
 }
 
 func parseCurrency(message string) (string, error) {
@@ -80,8 +78,8 @@ func parseCurrency(message string) (string, error) {
 		return "Напишите валюту правильно. Например: /currency EUR", nil
 	} else {
 		currencyupper := strings.ToUpper(normalizedMessage) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
-	MainCurr = currencyupper
-	return "Успешно установлена валюта: ", nil
+		MainCurr = currencyupper
+		return "Успешно установлена валюта: ", nil
 	}
 }
 
@@ -130,10 +128,8 @@ func parseExpense(message string) (*storage.Expense, error) {
 	fmt.Print("parts[0]")
 	fmt.Print(parts[0])
 
-
 	s2 := fmt.Sprintf("%f", currency)
 	//s2 := strconv.Itoa(int(currency))
-
 
 	if parts[0] == "RUB" {
 		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0]
@@ -151,9 +147,9 @@ func parseExpense(message string) (*storage.Expense, error) {
 }
 
 func ValidCurr(currency string, amountfl float64) float64 {
-/**
+	/**
 
- */
+	 */
 	switch currency {
 	case "USD":
 		rubles := parseapi(1)
@@ -178,8 +174,7 @@ func ValidCurr(currency string, amountfl float64) float64 {
 	return 0
 }
 
-
-func parseapi(num int) float64{
+func parseapi(num int) float64 {
 	/**
 	Функция parseapi нужна, чтобы достать данные из API exchangeratesapi
 	1. Выше объявлены две структуры: Currency и Rates, в них запишутся данные из API.
@@ -188,7 +183,7 @@ func parseapi(num int) float64{
 	4. Для отправки объекта используется Do().
 	5. Содержимое буфера вычитывается, чтобы записать в файл.
 	*/
-	url :="http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1"
+	url := "http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1"
 
 	spaceClient := http.Client{
 		Timeout: time.Second * 2,
@@ -240,7 +235,7 @@ func parseapi(num int) float64{
 
 	Ниже я высчитываю курс валюты к валюте с помощью формулы выше. Лучший вариант — найти апи,
 	где базовая валюьа — рубль, но я взяла такой.
-	 */
+	*/
 
 	switch num {
 	case 1:
@@ -259,7 +254,6 @@ func parseapi(num int) float64{
 	}
 	return 0
 }
-
 
 func GetReport(userID int64, message string) (string, error) {
 
@@ -340,7 +334,6 @@ func formatExpenses(expenses []*storage.Expense, rates []*storage.Rates) string 
 		result := revert(expense)
 		expensesByCategory[expense.Category] += int(result)
 	}
-
 
 	var formattedResult strings.Builder
 
