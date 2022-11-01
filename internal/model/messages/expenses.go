@@ -148,7 +148,7 @@ func parseExpense(message string) (*storage.Expense, error) {
 
 func ValidCurr(currency string, amountfl float64) float64 {
 	/**
-
+	Получаем сумму в рублях
 	 */
 	switch currency {
 	case "USD":
@@ -165,7 +165,7 @@ func ValidCurr(currency string, amountfl float64) float64 {
 		return amountfl * rubles
 
 	case "EUR":
-		rubles := parseapi(3)
+		rubles := parseapi(3, )
 		return amountfl * rubles
 
 	case "RUB":
@@ -174,7 +174,7 @@ func ValidCurr(currency string, amountfl float64) float64 {
 	return 0
 }
 
-func parseapi(num int) float64 {
+func Parseapibeginning()  {
 	/**
 	Функция parseapi нужна, чтобы достать данные из API exchangeratesapi
 	1. Выше объявлены две структуры: Currency и Rates, в них запишутся данные из API.
@@ -208,10 +208,10 @@ func parseapi(num int) float64 {
 		}(res.Body)
 	}
 	body, readErr := io.ReadAll(res.Body)
+
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
-
 	Currency1 := Currency{}
 	jsonErr := json.Unmarshal(body, &Currency1)
 	if jsonErr != nil {
@@ -224,6 +224,9 @@ func parseapi(num int) float64 {
 	eur = float64(1)
 
 	storage.CurrencyStorage2(usd, cny, rub, eur)
+}
+
+func parseapi(num int) float64 {
 
 	/**
 	Что происходит ниже:
@@ -236,9 +239,10 @@ func parseapi(num int) float64 {
 	Ниже я высчитываю курс валюты к валюте с помощью формулы выше. Лучший вариант — найти апи,
 	где базовая валюьа — рубль, но я взяла такой.
 	*/
-
+	Currency1 := Currency{}
 	switch num {
 	case 1:
+		//converted := Currency{}
 		converted := Currency1.Rates.RUB / Currency1.Rates.USD
 		return converted
 
