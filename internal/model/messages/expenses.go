@@ -68,18 +68,21 @@ func AddExpense(id int64, message string) error {
 }
 
 func parseCurrency(message string) (string, error) {
-	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/currency"))
-	parts := strings.Split(normalizedMessage, " ")
+	//normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/currency"))
+	parts := strings.Split(message, " ")
 
-	if len(parts) != 1 {
-		return "Напишите валюту правильно. Например: /currency EUR", nil
-	}
-	if parts[0] == "" {
-		return "Напишите валюту правильно. Например: /currency EUR", nil
+	if len(parts) != 2 {
+		return "Вы забыли ввести валюту. Бот поддерживает RUB, EUR, CNY и USD. Пример правильной команды: «/currency CNY»", nil
 	} else {
-		currencyupper := strings.ToUpper(normalizedMessage) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
-		MainCurr = currencyupper
-		return "Успешно установлена валюта: ", nil
+		currencyupper := strings.ToUpper(parts[1]) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
+
+		if currencyupper == "RUB" || currencyupper == "EUR" ||currencyupper == "CNY" || currencyupper == "USD" {
+			//проверка, чтобы не записать в валюту тарабарщину
+			MainCurr = currencyupper
+			return "Успешно установлена валюта: ", nil
+		} else {
+			return "Введите правильную валюту. Например, «/currency CNY»", nil
+		}
 	}
 }
 
@@ -98,11 +101,15 @@ func parseExpense(message string) (*storage.Expense, error) {
 	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, ExpensesPrefix))
 	parts := strings.Split(normalizedMessage, ", ")
 
-	if len(parts) != 4 { // Проверяем, что передаётся верное количество аргументов — 3.
-		_ = fmt.Sprint("Ошибка: введите три параметра.")
-		return nil, nil
+
+	if len(parts) != 4 { // Проверяем, что передаётся верное количество аргументов — 4.
+		return nil, errors.New("Ошибка: введите четыре параметра.")
 	}
 
+	if parts[0] != "RUB" && parts[0] != "EUR" && parts[0] != "CNY" && parts[0] != "USD" {
+		//проверка, чтобы не записать в валюту тарабарщину
+		return nil, fmt.Errorf("Ошибка: неправильная валюта. Бот поддерживает RUB, EUR, CNY и USD.")
+	}
 	/**
 	Сейчас все элементы в строке — String. Чтобы траты можно было складывать, нужно перевести её в Int.
 	1. Преобразуем сумму траты из String в Int с помощью Atoi.
@@ -113,20 +120,21 @@ func parseExpense(message string) (*storage.Expense, error) {
 	amountfl := float64(amount)
 
 	if err != nil {
-		return nil, errors.New("Сумма должна быть цифрой")
+		return nil, errors.New("Ошибка: сумма должна быть цифрой")
 	}
 
 	//const layout = "2021-11-22"
 	ts, err := time.Parse("2006-01-02", parts[3])
 
 	if err != nil {
-		return nil, fmt.Errorf("Напишите дату в формате день-месяц-год")
+		return nil, fmt.Errorf("Ошибка: напишите дату в формате день-месяц-год")
 	}
 
 	currency := ValidCurr(parts[0], amountfl)
+
 	MainCurr = parts[0]
-	fmt.Print("parts[0]")
-	fmt.Print(parts[0])
+	//fmt.Print("parts[0]")
+	//fmt.Print(parts[0])
 
 	s2 := fmt.Sprintf("%f", currency)
 	//s2 := strconv.Itoa(int(currency))
@@ -289,8 +297,12 @@ func parsePeriod(message string) (*time.Time, error) {
 	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/get"))
 	parts := strings.Split(normalizedMessage, " ")
 
-	if len(parts) != 1 {
-		return nil, errors.New("Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
+	if len(parts) > 2 {
+		return nil, fmt.Errorf("Слишком много аргументов. Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
+	}
+
+	if parts[0] == "" {
+		return nil, fmt.Errorf("Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
 	}
 
 	period := strings.ToLower(parts[0]) //на всякий случай, если напишет YeAr, а то может быть ошибка
