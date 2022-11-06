@@ -33,7 +33,7 @@ type Message struct {
 }
 
 func (s *Model) IncomingMessage(msg Message) error {
-	go parseapi(9)
+	go Parseapibeginning()
 	/**
 	Пользователь что-нибудь отправляет, далее проверяем команду.
 	Сценария четыре:
