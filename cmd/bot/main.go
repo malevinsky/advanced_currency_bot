@@ -5,6 +5,8 @@ import (
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/config"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/model/messages"
 	"log"
+	"net/http"
+	"time"
 )
 
 func main() {
@@ -14,6 +16,11 @@ func main() {
 		log.Fatal("config init failed:", err)
 	}
 
+	spaceClient := http.Client{
+		Timeout: time.Second * 2,
+	}
+
+	messages.Client1 = spaceClient
 
 
 	tgClient, err := tg.New(config)

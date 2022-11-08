@@ -1,6 +1,9 @@
 package storage
 
-import "time"
+import (
+
+	"time"
+)
 
 var userStorage map[int64]User = make(map[int64]User)
 
@@ -10,6 +13,7 @@ type User struct {
 }
 
 type Expense struct {
+
 	Amount   float64
 	Category string
 	Ts       time.Time

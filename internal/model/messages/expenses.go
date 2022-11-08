@@ -76,7 +76,7 @@ func parseCurrency(message string) (string, error) {
 	} else {
 		currencyupper := strings.ToUpper(parts[1]) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
 
-		if currencyupper == "RUB" || currencyupper == "EUR" ||currencyupper == "CNY" || currencyupper == "USD" {
+		if currencyupper == "RUB" || currencyupper == "EUR" || currencyupper == "CNY" || currencyupper == "USD" {
 			//проверка, чтобы не записать в валюту тарабарщину
 			MainCurr = currencyupper
 			return "Успешно установлена валюта: ", nil
@@ -100,7 +100,6 @@ func parseExpense(message string) (*storage.Expense, error) {
 	*/
 	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, ExpensesPrefix))
 	parts := strings.Split(normalizedMessage, ", ")
-
 
 	if len(parts) != 4 { // Проверяем, что передаётся верное количество аргументов — 4.
 		return nil, errors.New("Ошибка: введите четыре параметра.")
@@ -157,7 +156,7 @@ func parseExpense(message string) (*storage.Expense, error) {
 func ValidCurr(currency string, amountfl float64) float64 {
 	/**
 	Получаем сумму в рублях
-	 */
+	*/
 	switch currency {
 	case "USD":
 		rubles := parseapi(1)
@@ -173,7 +172,7 @@ func ValidCurr(currency string, amountfl float64) float64 {
 		return amountfl * rubles
 
 	case "EUR":
-		rubles := parseapi(3, )
+		rubles := parseapi(3)
 		return amountfl * rubles
 
 	case "RUB":
@@ -182,7 +181,9 @@ func ValidCurr(currency string, amountfl float64) float64 {
 	return 0
 }
 
-func Parseapibeginning()  {
+var Client1 http.Client
+
+func Parseapibeginning() {
 	/**
 	Функция parseapi нужна, чтобы достать данные из API exchangeratesapi
 	1. Выше объявлены две структуры: Currency и Rates, в них запишутся данные из API.
@@ -193,9 +194,7 @@ func Parseapibeginning()  {
 	*/
 	url := "http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1"
 
-	spaceClient := http.Client{
-		Timeout: time.Second * 2,
-	}
+	spaceClient := Client1
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -312,7 +311,6 @@ func parsePeriod(message string) (*time.Time, error) {
 	period := strings.ToLower(parts[0]) //на всякий случай, если напишет YeAr, а то может быть ошибка
 
 	/**
-
 	1. Узнаём время на момент отправки сообщения.
 	2. Нужно получить период Time, за который мы выводим результаты.
 	О цифрах в Addtime:
@@ -320,6 +318,7 @@ func parsePeriod(message string) (*time.Time, error) {
 	- -1 — это нынешняя дата минус один месяц;
 	- -1 — это нынешняя дата минус год.
 	*/
+
 	now := time.Now()
 	switch period {
 	case "week":
