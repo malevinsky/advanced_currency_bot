@@ -25,6 +25,7 @@ var cny = 6.6
 var rub = 6.6
 var eur = 6.6
 
+var limit = 6.6
 /**
 Currency и Rates — это структуры, куда записываются данные из API. Дополнительно EUR — его значение «1»,
 потому что это базовая валюта, от которой высчитываются значения остальных.
@@ -67,6 +68,19 @@ func AddExpense(id int64, message string) error {
 	return nil
 }
 
+//func AddLimit(id int64, message string) (string, error) {
+//	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/limit"))
+//	parts := strings.Split(normalizedMessage, " ")
+//	if len(parts) != 2 { // Проверяем, что передаётся верное количество аргументов — 2.
+//		return "", errors.New("Ошибка: введите верное количество параметров.")
+//	}
+//	amount, err := strconv.Atoi(parts[1])
+//	if err != nil {
+//		return "", errors.New("Ошибка при переведении строки в float")
+//	}
+//	limit := float64(amount)
+//
+//}
 func parseCurrency(message string) (string, error) {
 	//normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/currency"))
 	parts := strings.Split(message, " ")
@@ -102,7 +116,7 @@ func parseExpense(message string) (*storage.Expense, error) {
 	parts := strings.Split(normalizedMessage, ", ")
 
 
-	if len(parts) != 4 { // Проверяем, что передаётся верное количество аргументов — 4.
+	if len(parts) != 5 { // Проверяем, что передаётся верное количество аргументов — 4.
 		return nil, errors.New("Ошибка: введите четыре параметра.")
 	}
 
@@ -123,6 +137,13 @@ func parseExpense(message string) (*storage.Expense, error) {
 		return nil, errors.New("Ошибка: сумма должна быть цифрой")
 	}
 
+	amountLimit, err := strconv.Atoi(parts[1])
+	amountLimitFloat := float64(amountLimit)
+
+	if err != nil {
+		return nil, errors.New("Ошибка: сумма лимита на месяц должна быть цифрой")
+	}
+
 	//const layout = "2021-11-22"
 	ts, err := time.Parse("2006-01-02", parts[3])
 
@@ -130,6 +151,7 @@ func parseExpense(message string) (*storage.Expense, error) {
 		return nil, fmt.Errorf("Ошибка: напишите дату в формате день-месяц-год")
 	}
 
+	limit = ValidCurr(parts[0], amountLimitFloat)
 	currency := ValidCurr(parts[0], amountfl)
 
 	MainCurr = parts[0]
@@ -140,10 +162,10 @@ func parseExpense(message string) (*storage.Expense, error) {
 	//s2 := strconv.Itoa(int(currency))
 
 	if parts[0] == "RUB" {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0]
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0] + "\nТакже мы учли, что вы установили лимит трат на месяц: " + parts[4]
 		Greting = textgreting
 	} else {
-		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0]
+		textgreting := "Трата записана:\n- Категория: " + parts[2] + "\n- Сумма: " + parts[1] + " " + parts[0] + "\n- Сумма в рублях: " + s2 + "\n- Дата: " + parts[3] + "\n\nПолучить сумму всех трат по датам и категориям: \n/get + year | week | day." + "\n\nВалюта, которую вы сейчас используете: " + parts[0] + "\nТакже мы учли, что вы установили лимит трат на месяц: " + parts[4]
 		Greting = textgreting
 	}
 
@@ -158,22 +180,18 @@ func ValidCurr(currency string, amountfl float64) float64 {
 	/**
 	Получаем сумму в рублях
 	 */
+
 	switch currency {
 	case "USD":
-		rubles := parseapi(1)
+		rubles := parseapi("USD")
 		return amountfl * rubles
 
 	case "CNY":
-		rubles := parseapi(2)
-		//fmt.Print("\n\n")
-		//fmt.Print(rubles)
-		//fmt.Print(amountfl * rubles)
-		//fmt.Print("\n\n")
-
+		rubles := parseapi("CNY")
 		return amountfl * rubles
 
 	case "EUR":
-		rubles := parseapi(3, )
+		rubles := parseapi("EUR")
 		return amountfl * rubles
 
 	case "RUB":
@@ -197,7 +215,6 @@ func Parseapibeginning()  {
 		Timeout: time.Second * 2,
 	}
 
-
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -205,7 +222,7 @@ func Parseapibeginning()  {
 
 	res, getErr := spaceClient.Do(req)
 	if getErr != nil {
-		log.Fatal(getErr)
+		return
 	}
 
 	if res.Body != nil {
@@ -221,6 +238,7 @@ func Parseapibeginning()  {
 	if readErr != nil {
 		log.Fatal(readErr)
 	}
+
 	Currency1 := Currency{}
 	jsonErr := json.Unmarshal(body, &Currency1)
 	if jsonErr != nil {
@@ -232,10 +250,13 @@ func Parseapibeginning()  {
 	rub = Currency1.Rates.RUB
 	eur = float64(1)
 
+	fmt.Println("hellloo")
+	fmt.Print(rub)
+	fmt.Println("\n")
 	storage.CurrencyStorage2(usd, cny, rub, eur)
 }
 
-func parseapi(num int) float64 {
+func parseapi(num string) float64 {
 
 	/**
 	Что происходит ниже:
@@ -248,22 +269,27 @@ func parseapi(num int) float64 {
 	Ниже я высчитываю курс валюты к валюте с помощью формулы выше. Лучший вариант — найти апи,
 	где базовая валюьа — рубль, но я взяла такой.
 	*/
-	Currency1 := Currency{}
+
+	//expenses := storage.GetRates()
+	//fmt.Print(expenses)
+	Rates4 := storage.Rates{}
+	fmt.Print(Rates4)
 	switch num {
-	case 1:
-		//converted := Currency{}
-		converted := Currency1.Rates.RUB / Currency1.Rates.USD
+	case "USD":
+
+		converted := rub / usd
+		fmt.Print("attention!")
+		//fmt.Print(expenses.RUB)
 		return converted
 
-	case 2:
-		converted := Currency1.Rates.RUB / Currency1.Rates.CNY
+	case "CNY":
+		converted := rub / cny
 		fmt.Print("\n currency diff")
-		fmt.Print(Currency1.Rates.CNY)
+		fmt.Print(cny)
 		return converted
 
-	case 3:
-		return Currency1.Rates.RUB
-
+	case "EUR":
+		return rub
 	}
 	return 0
 }
@@ -289,7 +315,6 @@ func GetReport(userID int64, message string) (string, error) {
 		fmt.Print(rates)
 		return formatExpenses(expenses, rates), nil
 	}
-
 }
 
 func parsePeriod(message string) (*time.Time, error) {
@@ -378,9 +403,9 @@ func revert(expense *storage.Expense) float64 {
 	case "CNY":
 		difference := rub / cny
 		finalAmount := expense.Amount / difference
-		//fmt.Println(expense.Amount)
-		//fmt.Println(cny)
-		//fmt.Print(difference)
+		fmt.Println(expense.Amount)
+		fmt.Println(cny)
+		fmt.Print(difference)
 		return finalAmount
 	}
 	return expense.Amount

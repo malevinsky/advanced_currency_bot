@@ -28,7 +28,6 @@ type User struct {
 }
 
 type Expense struct {
-
 	Amount   float64
 	Category string
 	Ts       time.Time
@@ -62,6 +61,12 @@ type Rates struct {
 	EUR float64
 }
 
+func GetRates() []*Rates {
+	var result []*Rates
+
+	return result
+}
+
 func CurrencyStorage2(usd float64, cny float64, rub float64, eur float64) *Rates {
 	return &Rates{
 		USD: usd,
@@ -71,11 +76,7 @@ func CurrencyStorage2(usd float64, cny float64, rub float64, eur float64) *Rates
 	}
 }
 
-func GetRates() []*Rates {
-	var result []*Rates
 
-	return result
-}
 
 func AddExpense(userID int64, expense *Expense) {
 	user, ok := userStorage[userID]
