@@ -1,10 +1,25 @@
 package storage
 
 import (
-
+	"net/http"
 	"time"
 )
 
+type Repository struct {
+	client *http.Client
+}
+
+func NewRepository(client *http.Client) *Repository {
+	return &Repository{
+		client:   client,
+	}
+}
+
+func GetRepository() []*Repository {
+	var result []*Repository
+
+	return result
+}
 var userStorage map[int64]User = make(map[int64]User)
 
 type User struct {
