@@ -2,7 +2,7 @@ package messages
 
 import (
 	"encoding/json"
-	"fmt"
+
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/storage"
 	"io"
 	"log"
