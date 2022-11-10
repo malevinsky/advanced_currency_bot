@@ -1,13 +1,10 @@
 package messages
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/storage"
-	"io"
-	"log"
-	"net/http"
+	//"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +23,7 @@ var rub = 6.6
 var eur = 6.6
 
 var limit = 6.6
+
 /**
 Currency и Rates — это структуры, куда записываются данные из API. Дополнительно EUR — его значение «1»,
 потому что это базовая валюта, от которой высчитываются значения остальных.
@@ -48,7 +46,7 @@ type Rates struct {
 const ExpensesPrefix = "/add"
 
 func AddCurrency(id int64, message string) error {
-	expense, err := parseExpense(message) //
+	expense, err := parseExpense(message, id) //
 
 	if err != nil {
 		return err
@@ -59,7 +57,7 @@ func AddCurrency(id int64, message string) error {
 }
 
 func AddExpense(id int64, message string) error {
-	expense, err := parseExpense(message) //
+	expense, err := parseExpense(message, id) //
 
 	if err != nil {
 		return err
@@ -68,39 +66,8 @@ func AddExpense(id int64, message string) error {
 	return nil
 }
 
-//func AddLimit(id int64, message string) (string, error) {
-//	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/limit"))
-//	parts := strings.Split(normalizedMessage, " ")
-//	if len(parts) != 2 { // Проверяем, что передаётся верное количество аргументов — 2.
-//		return "", errors.New("Ошибка: введите верное количество параметров.")
-//	}
-//	amount, err := strconv.Atoi(parts[1])
-//	if err != nil {
-//		return "", errors.New("Ошибка при переведении строки в float")
-//	}
-//	limit := float64(amount)
-//
-//}
-func parseCurrency(message string) (string, error) {
-	//normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/currency"))
-	parts := strings.Split(message, " ")
 
-	if len(parts) != 2 {
-		return "Вы забыли ввести валюту. Бот поддерживает RUB, EUR, CNY и USD. Пример правильной команды: «/currency CNY»", nil
-	} else {
-		currencyupper := strings.ToUpper(parts[1]) //всё привожу к большим буквам, чтобы не вылезла ошибка, если отправят EuR или rUb
-
-		if currencyupper == "RUB" || currencyupper == "EUR" ||currencyupper == "CNY" || currencyupper == "USD" {
-			//проверка, чтобы не записать в валюту тарабарщину
-			MainCurr = currencyupper
-			return "Успешно установлена валюта: ", nil
-		} else {
-			return "Введите правильную валюту. Например, «/currency CNY»", nil
-		}
-	}
-}
-
-func parseExpense(message string) (*storage.Expense, error) {
+func parseExpense(message string, id int64) (*storage.Expense, error) {
 	/**
 	У нас есть строка с параметрами, которую отправил пользователь.
 	1. Чтобы обрабатывать каждый аргумент отдельно, их нужно поделить с помощью метода Split. Разграничитель — запятая.
@@ -114,7 +81,6 @@ func parseExpense(message string) (*storage.Expense, error) {
 	*/
 	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, ExpensesPrefix))
 	parts := strings.Split(normalizedMessage, ", ")
-
 
 	if len(parts) != 5 { // Проверяем, что передаётся верное количество аргументов — 4.
 		return nil, errors.New("Ошибка: введите четыре параметра.")
@@ -151,6 +117,7 @@ func parseExpense(message string) (*storage.Expense, error) {
 		return nil, fmt.Errorf("Ошибка: напишите дату в формате день-месяц-год")
 	}
 
+	fmt.Print(ts)
 	limit = ValidCurr(parts[0], amountLimitFloat)
 	currency := ValidCurr(parts[0], amountfl)
 
@@ -169,17 +136,22 @@ func parseExpense(message string) (*storage.Expense, error) {
 		Greting = textgreting
 	}
 
-	fmt.Print("\n\n")
-	fmt.Print(currency)
-	fmt.Print(int(currency))
-	fmt.Print("\n\n")
-	return storage.NewExpense(currency, parts[2], ts, amountfl), nil
+
+	start_period := time.Now()
+	start_period = start_period.AddDate(0, -1, 0)
+
+	expenses := storage.GetExpenses(id, start_period)
+	rates := storage.GetRates()
+	value, err4 := formatLimit(expenses, rates, limit, id)
+	//fmt.Print(value)
+	return value, err4
 }
+
 
 func ValidCurr(currency string, amountfl float64) float64 {
 	/**
 	Получаем сумму в рублях
-	 */
+	*/
 
 	switch currency {
 	case "USD":
@@ -198,62 +170,6 @@ func ValidCurr(currency string, amountfl float64) float64 {
 		return amountfl
 	}
 	return 0
-}
-
-func Parseapibeginning()  {
-	/**
-	Функция parseapi нужна, чтобы достать данные из API exchangeratesapi
-	1. Выше объявлены две структуры: Currency и Rates, в них запишутся данные из API.
-	2. HTTP-запрос к веб-ресурсу отправляется через http.Client.
-	3. Для создания объекта используется http.NewRequest().
-	4. Для отправки объекта используется Do().
-	5. Содержимое буфера вычитывается, чтобы записать в файл.
-	*/
-	url := "http://api.exchangeratesapi.io/v1/latest?access_key=9c484230306ca3014e2eb4c8575de8df&symbols=USD,CNY,RUB&format=1"
-
-	spaceClient := http.Client{
-		Timeout: time.Second * 2,
-	}
-
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	res, getErr := spaceClient.Do(req)
-	if getErr != nil {
-		return
-	}
-
-	if res.Body != nil {
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-				log.Fatal(getErr)
-			}
-		}(res.Body)
-	}
-	body, readErr := io.ReadAll(res.Body)
-
-	if readErr != nil {
-		log.Fatal(readErr)
-	}
-
-	Currency1 := Currency{}
-	jsonErr := json.Unmarshal(body, &Currency1)
-	if jsonErr != nil {
-		log.Fatal(jsonErr)
-	}
-
-	usd = Currency1.Rates.USD
-	cny = Currency1.Rates.CNY
-	rub = Currency1.Rates.RUB
-	eur = float64(1)
-
-	fmt.Println("hellloo")
-	fmt.Print(rub)
-	fmt.Println("\n")
-	storage.CurrencyStorage2(usd, cny, rub, eur)
 }
 
 func parseapi(num string) float64 {
@@ -315,98 +231,4 @@ func GetReport(userID int64, message string) (string, error) {
 		fmt.Print(rates)
 		return formatExpenses(expenses, rates), nil
 	}
-}
-
-func parsePeriod(message string) (*time.Time, error) {
-	/**
-	В этой функции происходят похожие процессы на обработку траты в expenses:
-	1. Получаем команду в string, её нужно разбить на части.
-	2. Обрабатываем части. В нашем случае она одна — week, month, year.
-	3. Если пользователь записал что-то криво, вылезет ошибка с подсказкой, как исправить.
-	*/
-	normalizedMessage := strings.TrimSpace(strings.TrimPrefix(message, "/get"))
-	parts := strings.Split(normalizedMessage, " ")
-
-	if len(parts) > 2 {
-		return nil, fmt.Errorf("Слишком много аргументов. Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
-	}
-
-	if parts[0] == "" {
-		return nil, fmt.Errorf("Допишите период, за который нужно получить отчёт: week, month, year. Например, /get year.")
-	}
-
-	period := strings.ToLower(parts[0]) //на всякий случай, если напишет YeAr, а то может быть ошибка
-
-	/**
-	1. Узнаём время на момент отправки сообщения.
-	2. Нужно получить период Time, за который мы выводим результаты.
-	О цифрах в Addtime:
-	- -7 — это нынешняя дата минус 7 дней;
-	- -1 — это нынешняя дата минус один месяц;
-	- -1 — это нынешняя дата минус год.
-	*/
-
-	now := time.Now()
-	switch period {
-	case "week":
-		now = now.AddDate(0, 0, -7)
-	case "month":
-		now = now.AddDate(0, -1, 0)
-	case "year":
-		now = now.AddDate(-1, 0, 0)
-	default:
-		return nil, errors.New("Неправильная команда. Я использую только week, month, year. Например, /get year.")
-	}
-
-	return &now, nil
-}
-
-// Format expenses by category into table
-func formatExpenses(expenses []*storage.Expense, rates []*storage.Rates) string {
-
-	if len(expenses) == 0 {
-		return "Вы пока не добавили трату."
-	}
-	/**
-	Цель — достать значения и красиво их вывести. Достаё
-	*/
-	expensesByCategory := make(map[string]int)
-	for _, expense := range expenses {
-		//fmt.Println(reflect.TypeOf(expense))
-		result := revert(expense)
-		expensesByCategory[expense.Category] += int(result)
-	}
-
-	var formattedResult strings.Builder
-
-	for category, amount := range expensesByCategory {
-		formattedResult.WriteString(fmt.Sprintf("\n%s: %d", category, amount))
-	}
-
-	return formattedResult.String()
-}
-
-func revert(expense *storage.Expense) float64 {
-	//Currency1 := Currency{}
-
-	switch MainCurr {
-	case "EUR":
-		difference := rub / eur
-		finalAmount := float64(expense.Amount) / difference
-		return finalAmount
-
-	case "USD":
-		difference := rub / usd
-		finalAmount := float64(expense.Amount) / difference
-		return finalAmount
-
-	case "CNY":
-		difference := rub / cny
-		finalAmount := expense.Amount / difference
-		fmt.Println(expense.Amount)
-		fmt.Println(cny)
-		fmt.Print(difference)
-		return finalAmount
-	}
-	return expense.Amount
 }

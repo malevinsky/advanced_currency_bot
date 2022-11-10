@@ -22,6 +22,11 @@ func GetRepository() []*Repository {
 }
 var userStorage map[int64]User = make(map[int64]User)
 
+type userStorage2 struct {
+	Id	int64
+	User	[]*User
+}
+
 type User struct {
 	ID       int64
 	Expenses []*Expense
@@ -92,6 +97,23 @@ func (u *User) addExpense(e *Expense) {
 }
 
 func GetExpenses(userID int64, start_period time.Time) []*Expense {
+	user, ok := userStorage[userID]
+	if !ok {
+		return nil
+	}
+
+	var result []*Expense
+
+	for _, expense := range user.Expenses {
+		if expense.Ts.After(start_period) {
+			result = append(result, expense)
+		}
+	}
+
+	return result
+}
+
+func Get1(userID int64, start_period time.Time) []*Expense {
 	user, ok := userStorage[userID]
 	if !ok {
 		return nil
