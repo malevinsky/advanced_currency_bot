@@ -16,6 +16,7 @@ type Client struct {
 	client *tgbotapi.BotAPI
 }
 
+
 func New(tokenGetter TokenGetter) (*Client, error) {
 	client, err := tgbotapi.NewBotAPI(tokenGetter.Token())
 	if err != nil {
@@ -60,4 +61,6 @@ func (c *Client) ListenUpdates(msgModel *messages.Model) {
 			}
 		}
 	}
+	c.client.StopReceivingUpdates()
+
 }

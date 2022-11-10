@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/clients/tg"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/config"
 	"gitlab.ozon.dev/amalevinskaya/teodora-malevinskaia/internal/model/messages"
@@ -15,13 +16,13 @@ import (
 func main() {
 	config, err := config.New()
 	if err != nil {
-		log.Fatal("config init failed:", err)
+		errors.New("config init failed:")
 	}
 
 
 	tgClient, err := tg.New(config)
 	if err != nil {
-		log.Fatal("tg client init failed:", err)
+		errors.New("tg client init failed:")
 	}
 
 	msgModel := messages.New(tgClient)
@@ -30,6 +31,7 @@ func main() {
 	ctx = context.WithValue(ctx, "allDoneWG", &sync.WaitGroup{})
 
 	tgClient.ListenUpdates(msgModel)
+
 
 	go func() {
 		exit := make(chan os.Signal, 1)

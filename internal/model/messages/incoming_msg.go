@@ -27,6 +27,7 @@ func New(tgClient MessageSender) *Model {
 - сам текст,
 - идентификатор отправителя.
 */
+
 type Message struct {
 	Text   string
 	UserID int64
