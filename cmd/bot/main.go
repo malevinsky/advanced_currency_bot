@@ -24,7 +24,10 @@ func main() {
 
 	tgClient, err := tg.New(config)
 	if err != nil {
-		errors.New("tg client init failed:")
+		err := errors.New("tg client init failed:")
+		if err != nil {
+			return
+		}
 	}
 
 	msgModel := messages.New(tgClient)

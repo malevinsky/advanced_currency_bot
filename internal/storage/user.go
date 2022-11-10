@@ -23,11 +23,6 @@ func GetRepository() []*Repository {
 
 var userStorage map[int64]User = make(map[int64]User)
 
-type userStorage2 struct {
-	Id   int64
-	User []*User
-}
-
 type User struct {
 	ID       int64
 	Expenses []*Expense

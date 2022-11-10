@@ -60,8 +60,5 @@ func Parseapibeginning() {
 	rub = Currency1.Rates.RUB
 	eur = float64(1)
 
-	fmt.Println("hellloo")
-	fmt.Print(rub)
-	fmt.Println("\n")
 	storage.CurrencyStorage2(usd, cny, rub, eur)
 }
