@@ -39,7 +39,7 @@ func formatLimit(expenses []*storage.Expense, rates []*storage.Rates, limit floa
 
 	} else {
 		return nil, nil
-}
+	}
 }
 
 func formatExpenses(expenses []*storage.Expense, rates []*storage.Rates) string {

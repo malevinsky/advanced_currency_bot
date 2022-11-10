@@ -38,8 +38,6 @@ func Test_OnUnknownCommand_ShouldAnswerWithHelpMessage(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-
-
 func Test_UnknownCurrency(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	sender := mocks.NewMockMessageSender(ctrl)
@@ -68,7 +66,6 @@ func Test_CurrencyWithNoCommand(t *testing.T) {
 
 	assert.NoError(t, err)
 }
-
 
 func Test_CurrencyWithTooManyCommands(t *testing.T) {
 	ctrl := gomock.NewController(t)
@@ -142,8 +139,6 @@ func Test_NoDetails(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-
-
 func Test_GetWithoutArguments(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	sender := mocks.NewMockMessageSender(ctrl)
@@ -185,4 +180,3 @@ func Test_UnknownParameter(t *testing.T) {
 	})
 	assert.NoError(t, err)
 }
-

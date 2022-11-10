@@ -11,7 +11,7 @@ type Repository struct {
 
 func NewRepository(client *http.Client) *Repository {
 	return &Repository{
-		client:   client,
+		client: client,
 	}
 }
 
@@ -20,11 +20,12 @@ func GetRepository() []*Repository {
 
 	return result
 }
+
 var userStorage map[int64]User = make(map[int64]User)
 
 type userStorage2 struct {
-	Id	int64
-	User	[]*User
+	Id   int64
+	User []*User
 }
 
 type User struct {
@@ -80,8 +81,6 @@ func CurrencyStorage2(usd float64, cny float64, rub float64, eur float64) *Rates
 		EUR: eur,
 	}
 }
-
-
 
 func AddExpense(userID int64, expense *Expense) {
 	user, ok := userStorage[userID]

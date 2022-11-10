@@ -16,9 +16,11 @@ import (
 func main() {
 	config, err := config.New()
 	if err != nil {
-		errors.New("config init failed:")
+		err := errors.New("config init failed:")
+		if err != nil {
+			return
+		}
 	}
-
 
 	tgClient, err := tg.New(config)
 	if err != nil {
@@ -31,7 +33,6 @@ func main() {
 	ctx = context.WithValue(ctx, "allDoneWG", &sync.WaitGroup{})
 
 	tgClient.ListenUpdates(msgModel)
-
 
 	go func() {
 		exit := make(chan os.Signal, 1)

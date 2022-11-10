@@ -66,7 +66,6 @@ func AddExpense(id int64, message string) error {
 	return nil
 }
 
-
 func parseExpense(message string, id int64) (*storage.Expense, error) {
 	/**
 	У нас есть строка с параметрами, которую отправил пользователь.
@@ -136,7 +135,6 @@ func parseExpense(message string, id int64) (*storage.Expense, error) {
 		Greting = textgreting
 	}
 
-
 	start_period := time.Now()
 	start_period = start_period.AddDate(0, -1, 0)
 
@@ -146,7 +144,6 @@ func parseExpense(message string, id int64) (*storage.Expense, error) {
 	//fmt.Print(value)
 	return value, err4
 }
-
 
 func ValidCurr(currency string, amountfl float64) float64 {
 	/**
